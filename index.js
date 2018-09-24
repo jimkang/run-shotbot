@@ -14,8 +14,9 @@ var shotRetries = 0;
 var shotRetryLimit = 5;
 
 if (process.env.BOT) {
-  var configPath = __dirname + './configs/' + process.env.BOT + '-config';
-  var behaviorPath = __dirname + './behaviors/' + process.env.BOT + '-behavior';
+  // Big assumption that this module will be in <project dir>/node_modules/run-shotbot.
+  var configPath = __dirname + '/../../configs/' + process.env.BOT + '-config';
+  var behaviorPath = __dirname + '/../../behaviors/' + process.env.BOT + '-behavior';
 } else {
   console.log('Usage: BOT=botname node post-shot.js [--dry]');
   process.exit();
