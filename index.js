@@ -150,7 +150,6 @@ function wrapUp(error, data) {
     retry(error);
   } else if (!dryRun) {
     console.log('Posted to targets!');
-    process.exit();
   }
 }
 
