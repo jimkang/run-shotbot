@@ -150,6 +150,7 @@ function wrapUp(error, data) {
     retry(error);
   } else if (!dryRun) {
     console.log('Posted to targets!');
+    process.exit();
   }
 }
 
@@ -161,5 +162,6 @@ function retry(e) {
     callNextTick(kickOff);
   } else {
     console.log('Reached retry limit. Giving up.');
+    process.exit();
   }
 }
