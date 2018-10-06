@@ -62,12 +62,12 @@ function getShot(webImageInst, done) {
     );
   }
 
-  function getImageWithMetadata({ url, altText, caption }) {
+  function getImageWithMetadata({ url, altText, caption, targetTexts }) {
     behavior.webimageOpts.url = url;
     webimage.getImage(behavior.webimageOpts, sb(passImageWithMetadata, done));
 
     function passImageWithMetadata(buffer) {
-      done(null, { buffer, altText, caption });
+      done(null, { buffer, altText, caption, targetTexts });
     }
   }
 
@@ -88,11 +88,11 @@ function shutDownWebimage(result, done) {
   }
 }
 
-function cropImage({ buffer, altText, caption }, done) {
+function cropImage({ buffer, altText, caption, targetTexts }, done) {
   if (behavior.shouldAutoCrop) {
     Jimp.read(buffer, sb(doCrop, done));
   } else {
-    callNextTick(done, null, { buffer, altText, caption });
+    callNextTick(done, null, { buffer, altText, caption, targetTexts });
   }
 
   function doCrop(image) {
@@ -101,11 +101,11 @@ function cropImage({ buffer, altText, caption }, done) {
   }
 
   function passCroppedBuffer(cropped) {
-    done(null, { buffer: cropped, altText, caption });
+    done(null, { buffer: cropped, altText, caption, targetTexts });
   }
 }
 
-function postToTargets({ buffer, altText, caption }, done) {
+function postToTargets({ buffer, altText, caption, targetTexts }, done) {
   if (dryRun) {
     let filePath =
       'scratch/' +
@@ -119,6 +119,7 @@ function postToTargets({ buffer, altText, caption }, done) {
     callNextTick(done, null, buffer);
   } else {
     let id = behavior.archive.idPrefix + '-' + randomId(8);
+    let targets = behavior.postingTargets.map(curry(getConfigForTarget)(targetTexts));
     postIt(
       {
         id,
@@ -126,18 +127,22 @@ function postToTargets({ buffer, altText, caption }, done) {
         altText,
         mediaFilename: id + '.png',
         buffer,
-        targets: behavior.postingTargets.map(getConfigForTarget)
+        targets
       },
       done
     );
   }
 }
 
-function getConfigForTarget(target) {
-  return {
+function getConfigForTarget(targetTexts, target) {
+  var opts = {
     type: target,
-    config: target === 'archive' ? behavior[target] : config[target]
+    config: target === 'archive' ? behavior[target] : config[target],
   };
+  if (targetTexts && target in targetTexts) {
+    opts.text = targetTexts[target];
+  }
+  return opts;
 }
 
 function wrapUp(error, data) {
