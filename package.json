@@ -23,7 +23,7 @@
     "async-waterfall": "^0.1.5",
     "jimp": "^0.2.28",
     "lodash.curry": "^4.1.1",
-    "static-web-archive": "^3.1.2",
+    "static-web-archive": "^4.0.5",
     "webimage": "^1.4.1"
   }
 }
