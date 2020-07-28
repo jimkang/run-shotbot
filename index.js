@@ -31,8 +31,6 @@ if (process.argv.length > 2) {
   dryRun = process.argv[2].toLowerCase() == '--dry';
 }
 
-return kickOff;
-
 function kickOff({ snapperURL, snapperKey }) {
   try {
     waterfall(
@@ -152,3 +150,5 @@ function retry(e) {
     process.exit();
   }
 }
+
+module.exports = kickOff;
