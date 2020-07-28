@@ -44,6 +44,33 @@ function kickOff({ snapperURL, snapperKey }) {
   } catch (e) {
     retry();
   }
+
+  function wrapUp(error, data) {
+    if (error) {
+      console.log(error, error.stack);
+
+      if (data) {
+        console.log('data:', data);
+      }
+      retry(error);
+    } else if (!dryRun) {
+      console.log('Posted to targets!');
+    }
+  }
+
+  function retry(e) {
+    console.log('Error while trying to get shot:', e);
+    if (shotRetries < shotRetryLimit) {
+      shotRetries += 1;
+      console.log('Retrying. Number of retries so far:', shotRetries);
+      callNextTick(kickOff, { snapperURL, snapperKey });
+    } else {
+      console.log('Reached retry limit. Giving up.');
+      process.exit();
+    }
+  }
+
+
 }
 
 function getShot({ snapperURL, snapperKey }, done) {
@@ -124,31 +151,6 @@ function getConfigForTarget(targetTexts, target) {
     opts.text = targetTexts[target];
   }
   return opts;
-}
-
-function wrapUp(error, data) {
-  if (error) {
-    console.log(error, error.stack);
-
-    if (data) {
-      console.log('data:', data);
-    }
-    retry(error);
-  } else if (!dryRun) {
-    console.log('Posted to targets!');
-  }
-}
-
-function retry(e) {
-  console.log('Error while trying to get shot:', e);
-  if (shotRetries < shotRetryLimit) {
-    shotRetries += 1;
-    console.log('Retrying. Number of retries so far:', shotRetries);
-    callNextTick(kickOff);
-  } else {
-    console.log('Reached retry limit. Giving up.');
-    process.exit();
-  }
 }
 
 module.exports = kickOff;
