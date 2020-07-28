@@ -1,6 +1,6 @@
 {
   "name": "run-shotbot",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "description": "The core of a multi-tenant app for bots that post screenshots of web pages.",
   "main": "index.js",
   "scripts": {
