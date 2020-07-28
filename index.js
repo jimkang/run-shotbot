@@ -1,14 +1,15 @@
 /* global process, __dirname */
 
 var waterfall = require('async-waterfall');
-var Webimage = require('webimage');
 var fs = require('fs');
 var callNextTick = require('call-next-tick');
 var randomId = require('idmaker').randomId;
-var sb = require('standard-bail')();
+var oknok = require('oknok');
 var curry = require('lodash.curry');
 var Jimp = require('jimp');
 var postIt = require('@jimkang/post-it');
+var request = require('request');
+var bodyMover = require('request-body-mover');
 
 var shotRetries = 0;
 var shotRetryLimit = 5;
@@ -30,17 +31,13 @@ if (process.argv.length > 2) {
   dryRun = process.argv[2].toLowerCase() == '--dry';
 }
 
-var webimage;
-
 kickOff();
 
 function kickOff() {
   try {
     waterfall(
       [
-        curry(Webimage)({ executablePath: process.env.CHROMEPATH }),
         getShot,
-        shutDownWebimage,
         cropImage,
         postToTargets
       ],
@@ -51,53 +48,39 @@ function kickOff() {
   }
 }
 
-function getShot(webImageInst, done) {
-  webimage = webImageInst;
-  if (behavior.generateImageURL) {
-    behavior.generateImageURL(sb(getImageWithMetadata, done));
-  } else {
-    webimage.getImage(
-      behavior.webimageOpts,
-      sb(passImageWithBehaviorMetadata, done)
-    );
-  }
+function getShot({ snapperURL, snapperKey }, done) {
+  behavior.generateImageURL(oknok({ ok: getImageWithMetadata, nok: done }));
 
   function getImageWithMetadata({ url, altText, caption, targetTexts }) {
     behavior.webimageOpts.url = url;
-    webimage.getImage(behavior.webimageOpts, sb(passImageWithMetadata, done));
+
+    var reqOpts = {
+      method: 'POST',
+      url: snapperURL,
+      body: behavior.webimageOpts,
+      json: true,
+      headers: {
+        Authorization: `Bearer ${snapperKey}`
+      }
+    };
+    request(reqOpts, bodyMover(oknok({ ok: passImageWithMetadata, nok: done })));
 
     function passImageWithMetadata(buffer) {
       done(null, { buffer, altText, caption, targetTexts });
     }
   }
-
-  function passImageWithBehaviorMetadata(buffer) {
-    done(null, {
-      buffer,
-      altText: behavior.getAltText(),
-      caption: behavior.getCaption()
-    });
-  }
-}
-
-function shutDownWebimage(result, done) {
-  webimage.shutDown(passResult);
-
-  function passResult(error) {
-    done(error, result);
-  }
 }
 
 function cropImage({ buffer, altText, caption, targetTexts }, done) {
   if (behavior.shouldAutoCrop) {
-    Jimp.read(buffer, sb(doCrop, done));
+    Jimp.read(buffer, oknok({ ok: doCrop, nok: done }));
   } else {
     callNextTick(done, null, { buffer, altText, caption, targetTexts });
   }
 
   function doCrop(image) {
     image.autocrop();
-    image.getBuffer(Jimp.AUTO, sb(passCroppedBuffer, done));
+    image.getBuffer(Jimp.AUTO, oknok({ ok: passCroppedBuffer, nok: done }));
   }
 
   function passCroppedBuffer(cropped) {

@@ -1,8 +1,8 @@
 .DS_Store
 node_modules
 configs/*.js
+config.js
 scratch/*.jpg
 scratch/*.png
 config.mk
 *.swp
-
