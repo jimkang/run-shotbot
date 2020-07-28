@@ -83,9 +83,10 @@ function getShot({ snapperURL, snapperKey }, done) {
       method: 'POST',
       url: snapperURL,
       body: behavior.webimageOpts,
-      json: true,
+      binary: true,
       headers: {
-        Authorization: `Bearer ${snapperKey}`
+        Authorization: `Bearer ${snapperKey}`,
+        'Content-Type': 'application/json'
       }
     };
     request(reqOpts, bodyMover(oknok({ ok: passImageWithMetadata, nok: done })));
