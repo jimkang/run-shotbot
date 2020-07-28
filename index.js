@@ -31,13 +31,13 @@ if (process.argv.length > 2) {
   dryRun = process.argv[2].toLowerCase() == '--dry';
 }
 
-kickOff();
+return kickOff;
 
-function kickOff() {
+function kickOff({ snapperURL, snapperKey }) {
   try {
     waterfall(
       [
-        getShot,
+        curry(getShot)({ snapperURL, snapperKey }),
         cropImage,
         postToTargets
       ],
