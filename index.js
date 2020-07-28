@@ -83,7 +83,7 @@ function getShot({ snapperURL, snapperKey }, done) {
       method: 'POST',
       url: snapperURL,
       body: behavior.webimageOpts,
-      binary: true,
+      encoding: null,
       headers: {
         Authorization: `Bearer ${snapperKey}`,
         'Content-Type': 'application/json'
