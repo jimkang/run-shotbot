@@ -77,12 +77,18 @@ function getShot({ snapperURL, snapperKey }, done) {
   behavior.generateImageURL(oknok({ ok: getImageWithMetadata, nok: done }));
 
   function getImageWithMetadata({ url, altText, caption, targetTexts }) {
-    behavior.webimageOpts.url = url;
+    var webimageOpts;
+    if (behavior.getWebimageOpts) {
+      webimageOpts = behavior.getWebimageOpts();
+    } else {
+      webimageOpts = behavior.webimageOpts;
+    }
+    webimageOpts.url = url;
 
     var reqOpts = {
       method: 'POST',
       url: snapperURL,
-      body: behavior.webimageOpts,
+      body: webimageOpts,
       json: true,
       encoding: null,
       headers: {
