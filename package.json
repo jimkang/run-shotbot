@@ -19,9 +19,9 @@
   "homepage": "https://github.com/jimkang/run-shotbot",
   "devDependencies": {},
   "dependencies": {
-    "@jimkang/post-it": "^1.1.1",
+    "@jimkang/post-it": "^1.1.2",
     "async-waterfall": "^0.1.5",
-    "jimp": "^0.2.28",
+    "jimp": "^0.16.0",
     "lodash.curry": "^4.1.1",
     "oknok": "^3.0.0",
     "request": "^2.88.2",
