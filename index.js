@@ -74,13 +74,14 @@ function kickOff({ snapperURL, snapperKey }) {
 }
 
 function getShot({ snapperURL, snapperKey }, done) {
-  behavior.generateImageURL(oknok({ ok: getImageWithMetadata, nok: done }));
+  var generateFn = behavior.generate;
+  if (!generateFn) {
+    generateFn = behavior.generateImageURL;
+  }
+  generateFn(oknok({ ok: getImageWithMetadata, nok: done }));
 
-  function getImageWithMetadata({ url, altText, caption, targetTexts }) {
-    var webimageOpts;
-    if (behavior.getWebimageOpts) {
-      webimageOpts = behavior.getWebimageOpts();
-    } else {
+  function getImageWithMetadata({ url, altText, caption, targetTexts, webimageOpts }) {
+    if (!webimageOpts) {
       webimageOpts = behavior.webimageOpts;
     }
     webimageOpts.url = url;
